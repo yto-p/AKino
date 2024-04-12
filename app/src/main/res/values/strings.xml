@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">AKino</string>
+    <string name="movies_and_series">Movies and series</string>
+    <string name="genre">GENRE:</string>
+    <string name="mpaa_rating">MPAA RATING:</string>
+    <string name="country">COUNTRY:</string>
+    <string name="retry">Retry</string>
+    <string name="description">Description:</string>
+    <string name="actors">Actors:</string>
+    <string name="reviews">Reviews:</string>
+</resources>
