@@ -1,4 +1,4 @@
-package com.mtuci.akino.details
+package com.mtuci.akino.details.data
 
 data class MovieDetails(
     val id: Int,
@@ -29,4 +29,24 @@ data class Person(
     val id: Int,
     val photo: String,
     val name: String?
+)
+
+data class Poster(
+    val url: String,
+    val previewUrl: String
+)
+
+data class PostersResponse(
+    val docs: List<Poster>
+)
+
+data class Review(
+    val author: String,
+    val date: String,
+    val type: String?,
+    val review: String?
+)
+
+data class ReviewResponse(
+    val docs: List<Review>
 )

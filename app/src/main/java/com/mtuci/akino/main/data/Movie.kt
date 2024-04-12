@@ -1,4 +1,4 @@
-package com.mtuci.akino.main
+package com.mtuci.akino.main.data
 
 data class Movie(
     val id: Int,

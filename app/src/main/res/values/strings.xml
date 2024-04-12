@@ -6,6 +6,9 @@
     <string name="country">COUNTRY:</string>
     <string name="retry">Retry</string>
     <string name="description">Description:</string>
-    <string name="actors">Actors:</string>
+    <string name="persons">Persons:</string>
     <string name="reviews">Reviews:</string>
+    <string name="posters">Posters:</string>
+    <string name="review">Review</string>
+    <string name="empty">-</string>
 </resources>

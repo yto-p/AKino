@@ -39,9 +39,10 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ){
+                        val id = it.arguments?.getInt("id") ?: error("Please specify `id` when route DetailsScreen")
                         DetailsScreen(
                             navController = navController,
-                            id = it.arguments?.getInt("id")
+                            id = id
                         )
                     }
                 }

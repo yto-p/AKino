@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.mtuci.akino.main.data.Movie
 import com.mtuci.akino.paging.MoviesPagingSource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
