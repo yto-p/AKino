@@ -2,8 +2,8 @@ package com.mtuci.akino.details.data
 
 data class MovieDetails(
     val id: Int,
-    val name: String,
-    val description: String,
+    val name: String?,
+    val description: String?,
     val rating: Rating,
     val backdrop: Backdrop,
     val movieLength: Int,

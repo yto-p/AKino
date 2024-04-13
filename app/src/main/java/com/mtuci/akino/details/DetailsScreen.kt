@@ -19,15 +19,11 @@ fun DetailsScreen(navController: NavController, id: Int) {
     val posters by viewModel.moviePosters.collectAsState()
     val pagingData = viewModel.reviews.collectAsLazyPagingItems()
 
-    movieDetails?.let {
-        posters?.docs?.let { it1 ->
-            DetailsContent(
-                isLoading = isLoading,
-                movieDetails = it,
-                posters = it1,
-                pagingData = pagingData,
-                onBackClick = navController::navigateUp,
-            )
-        }
-    }
+    DetailsContent(
+        isLoading = isLoading,
+        movieDetails = movieDetails,
+        posters = posters,
+        pagingData = pagingData,
+        onBackClick = navController::navigateUp,
+    )
 }

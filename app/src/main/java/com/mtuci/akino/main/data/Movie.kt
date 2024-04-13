@@ -15,3 +15,4 @@ data class Poster(
 data class MoviesResponse(
     val docs: List<Movie>
 )
+

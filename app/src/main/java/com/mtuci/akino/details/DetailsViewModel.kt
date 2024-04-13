@@ -8,6 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.mtuci.akino.api.ApiClient
 import com.mtuci.akino.details.data.MovieDetails
+import com.mtuci.akino.details.data.Poster
 import com.mtuci.akino.details.data.PostersResponse
 import com.mtuci.akino.details.data.Review
 import com.mtuci.akino.main.data.Movie
@@ -23,7 +24,7 @@ class DetailsViewModel(id: Int): ViewModel() {
     val isLoading = MutableStateFlow(false)
 
     val movieDetails = MutableStateFlow<MovieDetails?>(null)
-    val moviePosters = MutableStateFlow<PostersResponse?>(null)
+    val moviePosters = MutableStateFlow<List<Poster>?>(null)
 
     val reviews: Flow<PagingData<Review>> = Pager(PagingConfig(pageSize = 10)){
         ReviewsPagingSource(id)
@@ -58,7 +59,7 @@ class DetailsViewModel(id: Int): ViewModel() {
                     limit = 20,
                     movieId = id
                 )
-                moviePosters.value = posters
+                moviePosters.value = posters.docs
             } catch (e: HttpException) {
                 e.printStackTrace()
             } catch (e: IOException) {

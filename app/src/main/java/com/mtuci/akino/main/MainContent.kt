@@ -1,5 +1,7 @@
 package com.mtuci.akino.main
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,20 +13,36 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
@@ -32,15 +50,23 @@ import androidx.paging.compose.LazyPagingItems
 import com.mtuci.akino.R
 import com.mtuci.akino.main.data.Movie
 import com.mtuci.akino.main.movies.MovieContent
+import com.mtuci.akino.main.search.MovieSearchContent
+import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
 import com.mtuci.akino.ui.theme.SecondaryColor
+import com.mtuci.akino.ui.theme.TextLightColor
 
 @Composable
 fun MainContent(
     pagingData: LazyPagingItems<Movie>,
     openDetails: (id: Int) -> Unit,
+    searchText: String,
+    movieSearchList: List<Movie>,
+    isSearching: Boolean,
+    onSearchTextChange: (String) -> Unit,
     onFilterClick: () -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onBackClick: () -> Unit,
 ){
     Column(
         modifier = Modifier
@@ -49,103 +75,172 @@ fun MainContent(
             .padding(top = 32.dp)
             .padding(horizontal = 16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_filter),
-                contentDescription = "",
-                tint = PrimaryColor,
+        if (isSearching){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_back),
+                    contentDescription = "",
+                    tint = PrimaryColor,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = onBackClick)
+                        .padding(vertical = 6.dp, horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                val focusManager = LocalFocusManager.current
+                BasicTextField(
+                    value = searchText,
+                    onValueChange = onSearchTextChange,
+                    singleLine = true,
+                    textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text),
+                    decorationBox = { textField ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(BackgroundLightColor)
+                                .padding(
+                                    horizontal = 14.dp,
+                                    vertical = 16.dp
+                                )
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_search),
+                                contentDescription = "",
+                                tint = TextLightColor,
+                                modifier = Modifier.size(21.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            textField()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            LazyColumn(Modifier.fillMaxSize()){
+                items(movieSearchList.size){ index ->
+                    val item = movieSearchList[index]
+                    MovieSearchContent(
+                        movieSearch = item,
+                        openDetails = { openDetails(item.id) }
+                    )
+                }
+            }
+        } else {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .clip(CircleShape)
-                    .clickable(onClick = onFilterClick)
-                    .padding(horizontal = 6.dp, vertical = 7.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_filter),
+                    contentDescription = "",
+                    tint = PrimaryColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .clip(CircleShape)
+                        .clickable(onClick = onFilterClick)
+                        .padding(horizontal = 6.dp, vertical = 7.dp)
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = "",
+                    tint = PrimaryColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .clip(CircleShape)
+                        .clickable(onClick = onSearchClick)
+                        .padding(6.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = stringResource(R.string.movies_and_series),
+                color = PrimaryColor,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 8.dp)
             )
-            Icon(
-                painter = painterResource(R.drawable.ic_search),
-                contentDescription = "",
-                tint = PrimaryColor,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .clip(CircleShape)
-                    .clickable(onClick = onSearchClick)
-                    .padding(6.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = stringResource(R.string.movies_and_series),
-            color = PrimaryColor,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 24.sp,
-            modifier = Modifier.padding(start = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2)){
-            if (pagingData.loadState.refresh is LoadState.Loading){
-                item {
-                    Box(modifier = Modifier.fillMaxSize().padding(30.dp)){
-                        CircularProgressIndicator(
-                            color = SecondaryColor,
-                            modifier = Modifier
-                                .align(Alignment.Center))
+            Spacer(modifier = Modifier.height(10.dp))
+            if (pagingData.itemCount != 0){
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(2)){
+                    if (pagingData.loadState.refresh is LoadState.NotLoading){
+                        items(pagingData.itemCount) { index ->
+                            val item = pagingData[index]
+                            item?.let {
+                                MovieContent(
+                                    movie = item,
+                                    openDetails = { openDetails(item.id) }
+                                )
+                            }
+                        }
+                    }
+                    if (pagingData.loadState.append is LoadState.Loading){
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(30.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    color = SecondaryColor,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                )
+                            }
+                        }
+                    }
+                    if (pagingData.loadState.append is LoadState.Error){
+                        item {
+                            ErrorFooter { pagingData.retry() }
+                        }
                     }
                 }
-            }
-            if (pagingData.loadState.refresh is LoadState.NotLoading){
-                items(pagingData.itemCount) { index ->
-                    val item = pagingData[index]
-                    item?.let {
-                        MovieContent(
-                            movie = item,
-                            openDetails = { openDetails(item.id) }
-                        )
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(2)){
+                    if (pagingData.loadState.refresh is LoadState.Loading){
+                        item {
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(30.dp)){
+                                CircularProgressIndicator(
+                                    color = SecondaryColor,
+                                    modifier = Modifier
+                                        .align(Alignment.Center))
+                            }
+                        }
                     }
-                }
-            }
-            if (pagingData.loadState.refresh is LoadState.Error){
-                item {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(30.dp)) {
-                        Text(
-                            text = stringResource(R.string.retry),
-                            fontStyle = FontStyle.Italic,
-                            color = PrimaryColor,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .clickable {
-                                    pagingData.refresh()
-                                })
+                    if (pagingData.loadState.refresh is LoadState.Error){
+                        item {
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(30.dp)) {
+                                Text(
+                                    text = stringResource(R.string.retry),
+                                    fontStyle = FontStyle.Italic,
+                                    color = PrimaryColor,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .clickable {
+                                            pagingData.refresh()
+                                        })
+                            }
+                        }
                     }
-                }
-            }
-
-            if (pagingData.loadState.append is LoadState.Loading){
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(30.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            color = SecondaryColor,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                        )
-                    }
-                }
-            }
-            if (pagingData.loadState.append is LoadState.Error){
-                item {
-                    ErrorFooter { pagingData.retry() }
                 }
             }
         }

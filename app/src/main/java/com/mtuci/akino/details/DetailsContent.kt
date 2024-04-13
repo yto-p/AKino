@@ -56,8 +56,8 @@ import com.mtuci.akino.ui.theme.TextLightColor
 @Composable
 fun DetailsContent(
     isLoading: Boolean,
-    movieDetails: MovieDetails,
-    posters: List<Poster>,
+    movieDetails: MovieDetails?,
+    posters: List<Poster>?,
     pagingData: LazyPagingItems<Review>,
     onBackClick: () -> Unit
 ){
@@ -81,6 +81,7 @@ fun DetailsContent(
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()){
                 item {
+                    movieDetails ?: return@item
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -121,7 +122,7 @@ fun DetailsContent(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = movieDetails.name,
+                        text = movieDetails.name ?: stringResource(id = R.string.empty),
                         fontWeight = FontWeight.Medium,
                         fontSize = 24.sp
                     )
@@ -193,7 +194,7 @@ fun DetailsContent(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = movieDetails.description,
+                        text = movieDetails.description ?: stringResource(R.string.empty),
                         color = PrimaryColor,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp
@@ -207,6 +208,7 @@ fun DetailsContent(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     LazyRow(modifier = Modifier.fillMaxWidth()){
+                        posters ?: return@LazyRow
                         items(posters){ poster ->
                             PosterContent(poster = poster)
                         }

@@ -33,4 +33,11 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("movieId") movieId: Int
     ): ReviewResponse
+
+    @GET("movie/search")
+    suspend fun getMovieSearchList(
+    @Query("page") page: Int,
+    @Query("limit") limit: Int,
+    @Query("query") query: String
+    ): MoviesResponse
 }
