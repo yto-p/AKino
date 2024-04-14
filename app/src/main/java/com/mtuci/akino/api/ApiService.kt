@@ -40,4 +40,13 @@ interface ApiService {
     @Query("limit") limit: Int,
     @Query("query") query: String
     ): MoviesResponse
+
+    @GET("movie")
+    suspend fun getMovieFilterList(
+        @Query("page") page: Int,
+        @Query("limit") limit: Int,
+        @Query("year") year: String?,
+        @Query("ageRating") ageRating: String?,
+        @Query("countries.name") countiesName: String?
+    ): MoviesResponse
 }

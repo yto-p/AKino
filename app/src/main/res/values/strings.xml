@@ -11,4 +11,10 @@
     <string name="posters">Posters:</string>
     <string name="review">Review</string>
     <string name="empty">-</string>
+    <string name="apply">Apply</string>
+    <string name="filters">Filters</string>
+    <string name="year">Year</string>
+    <string name="country_filter">Country</string>
+    <string name="age_rating">Age rating</string>
+    <string name="search">Search</string>
 </resources>

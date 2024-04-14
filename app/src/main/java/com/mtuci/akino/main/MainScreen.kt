@@ -22,6 +22,9 @@ fun MainScreen(navController: NavController){
     }
     val pagingData = viewModel.movies.collectAsLazyPagingItems()
     val searchText by viewModel.searchText.collectAsState()
+    val yearText by viewModel.yearText.collectAsState()
+    val countryText by viewModel.countryText.collectAsState()
+    val ageText by viewModel.ageText.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val movieSearchList by viewModel.movieSearchList.collectAsState()
 
@@ -31,9 +34,15 @@ fun MainScreen(navController: NavController){
             viewModel.onMovieClick(id) },
         searchText = searchText,
         isSearching = isSearching,
+        yearText = yearText,
+        countryText = countryText,
+        ageText = ageText,
+        onYearTextChange = viewModel::onYearTextChange,
+        onCountryTextChange = viewModel::onCountryTextChange,
+        onAgeTextChange = viewModel::onAgeTextChange,
         movieSearchList = movieSearchList.docs,
         onSearchTextChange = viewModel::onSearchTextChange,
-        onFilterClick = {},
+        onApplyClick = viewModel::onApplyClick,
         onSearchClick = viewModel::onSearchClick,
         onBackClick = viewModel::onBackClick
     )

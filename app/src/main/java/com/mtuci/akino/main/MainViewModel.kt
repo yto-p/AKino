@@ -23,6 +23,10 @@ class MainViewModel: ViewModel() {
         MoviesPagingSource()
     }.flow
 
+    val yearText = MutableStateFlow("")
+    val countryText = MutableStateFlow("")
+    val ageText = MutableStateFlow("")
+
     val searchText = MutableStateFlow("")
     val isSearching = MutableStateFlow(false)
     val movieSearchList = MutableStateFlow(MoviesResponse(listOf()))
@@ -44,6 +48,35 @@ class MainViewModel: ViewModel() {
         isSearching.value = true
     }
 
+    fun onApplyClick(){
+        isSearching.value = true
+        val year =
+            yearText.value.trim().ifEmpty {
+                null
+            }
+        val age =
+            ageText.value.trim().ifEmpty {
+                null
+            }
+        val country =
+            countryText.value.trim().ifEmpty {
+                null
+            }
+        viewModelScope.launch {
+            try {
+                val result = ApiClient.apiService.getMovieFilterList(1, 40, year, age, country)
+                movieSearchList.value = result
+            } catch (e: HttpException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        yearText.value = ""
+        countryText.value = ""
+        ageText.value = ""
+    }
+
     fun onBackClick(){
         isSearching.value = false
         searchText.value = ""
@@ -53,6 +86,18 @@ class MainViewModel: ViewModel() {
     fun onSearchTextChange(text: String){
         searchText.value = text
         getSearchResult(text)
+    }
+
+    fun onCountryTextChange(text: String){
+        countryText.value = text
+    }
+
+    fun onAgeTextChange(text: String){
+        ageText.value = text
+    }
+
+    fun onYearTextChange(text: String){
+        yearText.value = text
     }
 
     fun onMovieClick(id: Int){

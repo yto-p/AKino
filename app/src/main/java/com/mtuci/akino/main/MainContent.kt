@@ -26,15 +26,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +54,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
@@ -55,7 +67,9 @@ import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
 import com.mtuci.akino.ui.theme.SecondaryColor
 import com.mtuci.akino.ui.theme.TextLightColor
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(
     pagingData: LazyPagingItems<Movie>,
@@ -63,8 +77,14 @@ fun MainContent(
     searchText: String,
     movieSearchList: List<Movie>,
     isSearching: Boolean,
+    yearText: String,
+    countryText: String,
+    ageText: String,
+    onYearTextChange: (String) -> Unit,
+    onCountryTextChange: (String) -> Unit,
+    onAgeTextChange: (String) -> Unit,
     onSearchTextChange: (String) -> Unit,
-    onFilterClick: () -> Unit,
+    onApplyClick: () -> Unit,
     onSearchClick: () -> Unit,
     onBackClick: () -> Unit,
 ){
@@ -75,6 +95,151 @@ fun MainContent(
             .padding(top = 32.dp)
             .padding(horizontal = 16.dp)
     ) {
+        val sheetState = rememberModalBottomSheetState()
+        val scope = rememberCoroutineScope()
+        var showBottomSheet by remember { mutableStateOf(false) }
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState,
+                containerColor = Color.White
+                ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp)
+                        .padding(bottom = 15.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.filters),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = PrimaryColor,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(15.dp))
+                    BasicTextField(
+                        value = yearText,
+                        onValueChange = onYearTextChange,
+                        singleLine = true,
+                        textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
+                        decorationBox = { textField ->
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(BackgroundLightColor)
+                                    .padding(
+                                        horizontal = 14.dp,
+                                        vertical = 16.dp
+                                    )
+                            ) {
+                                Spacer(Modifier.width(6.dp))
+                                if (yearText.isEmpty()) {
+                                    Text(
+                                        text = stringResource(R.string.year),
+                                        fontSize = 16.sp,
+                                        color = TextLightColor
+                                    )
+                                }
+                                textField()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(18.dp))
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    BasicTextField(
+                        value = countryText,
+                        onValueChange = onCountryTextChange,
+                        singleLine = true,
+                        textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
+                        decorationBox = { textField ->
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(BackgroundLightColor)
+                                    .padding(
+                                        horizontal = 14.dp,
+                                        vertical = 16.dp
+                                    )
+                            ) {
+                                Spacer(Modifier.width(6.dp))
+                                if (countryText.isEmpty()) {
+                                    Text(
+                                        text = stringResource(R.string.country_filter),
+                                        fontSize = 16.sp,
+                                        color = TextLightColor
+                                    )
+                                }
+                                textField()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(18.dp))
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    BasicTextField(
+                        value = ageText,
+                        onValueChange = onAgeTextChange,
+                        singleLine = true,
+                        textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
+                        decorationBox = { textField ->
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(BackgroundLightColor)
+                                    .padding(
+                                        horizontal = 14.dp,
+                                        vertical = 16.dp
+                                    )
+                            ) {
+                                Spacer(Modifier.width(6.dp))
+                                if (ageText.isEmpty()) {
+                                    Text(
+                                        text = stringResource(R.string.age_rating),
+                                        fontSize = 16.sp,
+                                        color = TextLightColor
+                                    )
+                                }
+                                textField()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(18.dp))
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor),
+                        onClick = {
+                            onApplyClick()
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.apply),
+                            fontSize = 16.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
         if (isSearching){
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -99,8 +264,8 @@ fun MainContent(
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text),
                     decorationBox = { textField ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Box(
+                            contentAlignment = Alignment.CenterStart,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(18.dp))
                                 .background(BackgroundLightColor)
@@ -109,13 +274,14 @@ fun MainContent(
                                     vertical = 16.dp
                                 )
                         ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_search),
-                                contentDescription = "",
-                                tint = TextLightColor,
-                                modifier = Modifier.size(21.dp)
-                            )
                             Spacer(Modifier.width(6.dp))
+                            if (searchText.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.search),
+                                    fontSize = 16.sp,
+                                    color = TextLightColor
+                                )
+                            }
                             textField()
                         }
                     },
@@ -147,7 +313,7 @@ fun MainContent(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .clip(CircleShape)
-                        .clickable(onClick = onFilterClick)
+                        .clickable(onClick = { showBottomSheet = true })
                         .padding(horizontal = 6.dp, vertical = 7.dp)
                 )
                 Icon(
