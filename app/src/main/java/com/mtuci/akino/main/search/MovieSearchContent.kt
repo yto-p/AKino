@@ -46,7 +46,7 @@ fun MovieSearchContent(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             SubcomposeAsyncImage(
-                model = movieSearch.poster.previewUrl,
+                model = movieSearch.poster?.previewUrl,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

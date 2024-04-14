@@ -5,7 +5,7 @@ data class MovieDetails(
     val name: String?,
     val description: String?,
     val rating: Rating,
-    val backdrop: Backdrop,
+    val backdrop: Backdrop?,
     val movieLength: Int,
     val countries: List<Country>,
     val persons: List<Person>

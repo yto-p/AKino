@@ -110,7 +110,7 @@ fun DetailsContent(
                         }
                         Spacer(modifier = Modifier.height(24.dp))
                         SubcomposeAsyncImage(
-                            model = movieDetails.backdrop.url,
+                            model = movieDetails.backdrop?.url,
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

@@ -4,7 +4,7 @@ data class Movie(
     val id: Int,
     val name: String?,
     val year: Int,
-    val poster: Poster
+    val poster: Poster?
 )
 
 data class Poster(

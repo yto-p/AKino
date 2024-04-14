@@ -41,7 +41,7 @@ fun MovieContent(
             .padding(8.dp)
     ) {
         SubcomposeAsyncImage(
-            model = movie.poster.previewUrl,
+            model = movie.poster?.previewUrl,
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
