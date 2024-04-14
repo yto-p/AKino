@@ -1,8 +1,8 @@
 package com.mtuci.akino.main.search
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +18,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.request.ImageRequest
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import com.mtuci.akino.R
 import com.mtuci.akino.main.data.Movie
 import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
@@ -43,18 +45,28 @@ fun MovieSearchContent(
             .padding(8.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = rememberCoilPainter(
-                    request = ImageRequest.Builder(LocalContext.current).crossfade(true)
-                        .data(movieSearch.poster.previewUrl).build()
-                ),
+            SubcomposeAsyncImage(
+                model = movieSearch.poster.previewUrl,
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .height(120.dp)
                     .width(84.dp)
                     .clip(RoundedCornerShape(8.dp))
-            )
+            ){
+                val state = painter.state
+                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error){
+                    Box(
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(84.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(BackgroundLightColor)
+                    )
+                } else {
+                    SubcomposeAsyncImageContent()
+                }
+            }
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier

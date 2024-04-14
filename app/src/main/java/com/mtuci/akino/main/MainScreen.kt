@@ -21,6 +21,7 @@ fun MainScreen(navController: NavController){
         }
     }
     val pagingData = viewModel.movies.collectAsLazyPagingItems()
+    val isLoading by viewModel.isLoading.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val yearText by viewModel.yearText.collectAsState()
     val countryText by viewModel.countryText.collectAsState()
@@ -37,6 +38,7 @@ fun MainScreen(navController: NavController){
         yearText = yearText,
         countryText = countryText,
         ageText = ageText,
+        isLoading = isLoading,
         onYearTextChange = viewModel::onYearTextChange,
         onCountryTextChange = viewModel::onCountryTextChange,
         onAgeTextChange = viewModel::onAgeTextChange,

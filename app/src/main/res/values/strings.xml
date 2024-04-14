@@ -17,4 +17,6 @@
     <string name="country_filter">Country</string>
     <string name="age_rating">Age rating</string>
     <string name="search">Search</string>
+    <string name="no_data">No data</string>
+    <string name="no_name">No name</string>
 </resources>

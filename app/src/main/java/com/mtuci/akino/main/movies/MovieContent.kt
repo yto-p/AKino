@@ -1,9 +1,11 @@
 package com.mtuci.akino.main.movies
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -13,14 +15,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.request.ImageRequest
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.mtuci.akino.main.data.Movie
+import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
 
 @Composable
@@ -35,18 +38,28 @@ fun MovieContent(
             .clickable(onClick = openDetails)
             .padding(8.dp)
     ) {
-        Image(
-            painter = rememberCoilPainter(
-                request = ImageRequest.Builder(LocalContext.current).crossfade(true)
-                    .data(movie.poster.previewUrl).build()
-            ),
+        SubcomposeAsyncImage(
+            model = movie.poster.previewUrl,
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .height(240.dp)
-                .width(167.dp)
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-        )
+        ){
+            val state = painter.state
+            if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error){
+                Box(
+                    modifier = Modifier
+                        .height(240.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(BackgroundLightColor)
+                )
+            } else {
+                SubcomposeAsyncImageContent()
+            }
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = movie.name.uppercase(),

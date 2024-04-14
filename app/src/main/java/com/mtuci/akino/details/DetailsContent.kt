@@ -1,10 +1,11 @@
 package com.mtuci.akino.details
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -37,8 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import coil.request.ImageRequest
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.mtuci.akino.R
 import com.mtuci.akino.details.data.MovieDetails
 import com.mtuci.akino.details.data.Poster
@@ -46,9 +45,7 @@ import com.mtuci.akino.details.data.Review
 import com.mtuci.akino.details.persons.PersonContent
 import com.mtuci.akino.details.posters.PosterContent
 import com.mtuci.akino.details.reviews.ReviewContent
-import com.mtuci.akino.main.ErrorFooter
-import com.mtuci.akino.main.data.Movie
-import com.mtuci.akino.main.movies.MovieContent
+import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
 import com.mtuci.akino.ui.theme.SecondaryColor
 import com.mtuci.akino.ui.theme.TextLightColor
@@ -77,137 +74,161 @@ fun DetailsContent(
                 .fillMaxSize()
                 .safeDrawingPadding()
                 .padding(top = 32.dp)
-                .padding(horizontal = 32.dp)
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()){
                 item {
                     movieDetails ?: return@item
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_back),
-                            contentDescription = "",
-                            tint = PrimaryColor,
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .clip(CircleShape)
-                                .clickable(onClick = onBackClick)
-                                .padding(vertical = 6.dp, horizontal = 10.dp)
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.ic_share),
+                                .fillMaxWidth()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_back),
+                                contentDescription = "",
+                                tint = PrimaryColor,
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = onBackClick)
+                                    .padding(vertical = 6.dp, horizontal = 10.dp)
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.ic_share),
+                                contentDescription = "",
+                                tint = PrimaryColor,
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .clip(CircleShape)
+                                    .clickable { }
+                                    .padding(6.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                        SubcomposeAsyncImage(
+                            model = movieDetails.backdrop.url,
                             contentDescription = "",
-                            tint = PrimaryColor,
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .clip(CircleShape)
-                                .clickable { }
-                                .padding(6.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Image(
-                        painter = rememberCoilPainter(
-                            request = ImageRequest.Builder(LocalContext.current).crossfade(true)
-                                .data(movieDetails.backdrop.url).build()
-                        ),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .height(400.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = movieDetails.name ?: stringResource(id = R.string.empty),
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 24.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.align(Alignment.CenterStart)
-                        ) {
-                            Text(
-                                text = movieDetails.countries[0].name,
-                                color = TextLightColor,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                painter = painterResource(R.drawable.ic_lang),
-                                contentDescription = "",
-                                tint = SecondaryColor
-                            )
+                                .height(400.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                        ){
+                            val state = painter.state
+                            if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error){
+                                Box(
+                                    modifier = Modifier
+                                        .height(400.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(BackgroundLightColor)
+                                )
+                            } else {
+                                SubcomposeAsyncImageContent()
+                            }
                         }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.align(Alignment.Center)
-                        ) {
-                            Text(
-                                text = "${movieDetails.movieLength} min",
-                                color = TextLightColor,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                painter = painterResource(R.drawable.ic_time),
-                                contentDescription = "",
-                                tint = SecondaryColor
-                            )
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.align(Alignment.CenterEnd)
-                        ) {
-                            Text(
-                                text = movieDetails.rating.kp.toString(),
-                                color = TextLightColor,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                painter = painterResource(R.drawable.ic_star),
-                                contentDescription = "",
-                                tint = SecondaryColor
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                        Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            text = stringResource(R.string.description),
+                            text = movieDetails.name ?: stringResource(id = R.string.empty),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 24.sp
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            ) {
+                                Text(
+                                    text = movieDetails.countries[0].name,
+                                    color = TextLightColor,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_lang),
+                                    contentDescription = "",
+                                    tint = SecondaryColor
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.align(Alignment.Center)
+                            ) {
+                                Text(
+                                    text = "${movieDetails.movieLength} min",
+                                    color = TextLightColor,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_time),
+                                    contentDescription = "",
+                                    tint = SecondaryColor
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            ) {
+                                Text(
+                                    text = movieDetails.rating.kp.toString(),
+                                    color = TextLightColor,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_star),
+                                    contentDescription = "",
+                                    tint = SecondaryColor
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = stringResource(R.string.description),
+                                color = PrimaryColor,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 18.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = movieDetails.description ?: stringResource(R.string.empty),
+                            color = PrimaryColor,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = stringResource(R.string.posters),
                             color = PrimaryColor,
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = movieDetails.description ?: stringResource(R.string.empty),
-                        color = PrimaryColor,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(R.string.posters),
-                        color = PrimaryColor,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    LazyRow(modifier = Modifier.fillMaxWidth()){
+                    if (posters?.size == 0){
+                        Text(
+                            text = stringResource(R.string.empty),
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ){
                         posters ?: return@LazyRow
                         items(posters){ poster ->
                             PosterContent(poster = poster)
@@ -218,9 +239,16 @@ fun DetailsContent(
                         text = stringResource(R.string.persons),
                         color = PrimaryColor,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
+                    if (movieDetails.persons.isEmpty()){
+                        Text(
+                            text = stringResource(R.string.empty),
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
                     LazyRow(modifier = Modifier.fillMaxWidth()){
                         items(movieDetails.persons){ person ->
                             PersonContent(person = person)
@@ -231,8 +259,17 @@ fun DetailsContent(
                         text = stringResource(R.string.reviews),
                         color = PrimaryColor,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
+                    if (pagingData.itemCount == 0){
+                        Text(
+                            text = stringResource(R.string.empty),
+                            modifier = Modifier
+                                .padding(vertical = 12.dp)
+                                .padding(start = 16.dp)
+                        )
+                    }
                 }
                 if (pagingData.loadState.refresh is LoadState.Loading){
                     item {

@@ -24,6 +24,7 @@ fun ReviewContent(review: Review){
         Modifier
             .fillMaxWidth()
             .padding(vertical = 15.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Text(
             text = review.author,

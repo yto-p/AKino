@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -21,11 +22,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +57,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -80,6 +85,7 @@ fun MainContent(
     yearText: String,
     countryText: String,
     ageText: String,
+    isLoading: Boolean,
     onYearTextChange: (String) -> Unit,
     onCountryTextChange: (String) -> Unit,
     onAgeTextChange: (String) -> Unit,
@@ -109,6 +115,7 @@ fun MainContent(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                         .padding(horizontal = 15.dp)
                         .padding(bottom = 15.dp)
                 ) {
@@ -125,6 +132,7 @@ fun MainContent(
                         value = yearText,
                         onValueChange = onYearTextChange,
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
                         decorationBox = { textField ->
                             Box(
@@ -157,6 +165,7 @@ fun MainContent(
                         value = countryText,
                         onValueChange = onCountryTextChange,
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                         textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
                         decorationBox = { textField ->
                             Box(
@@ -189,6 +198,7 @@ fun MainContent(
                         value = ageText,
                         onValueChange = onAgeTextChange,
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         textStyle = TextStyle(color = PrimaryColor, fontSize = 16.sp, fontWeight = FontWeight.Normal),
                         decorationBox = { textField ->
                             Box(
@@ -291,13 +301,25 @@ fun MainContent(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
-            LazyColumn(Modifier.fillMaxSize()){
-                items(movieSearchList.size){ index ->
-                    val item = movieSearchList[index]
-                    MovieSearchContent(
-                        movieSearch = item,
-                        openDetails = { openDetails(item.id) }
+            if (isLoading) {
+                Box(
+                    Modifier.fillMaxSize()
+                ) {
+                    CircularProgressIndicator(
+                        color = SecondaryColor,
+                        modifier = Modifier
+                            .align(Alignment.Center)
                     )
+                }
+            } else {
+                LazyColumn(Modifier.fillMaxSize()){
+                    items(movieSearchList.size){ index ->
+                        val item = movieSearchList[index]
+                        MovieSearchContent(
+                            movieSearch = item,
+                            openDetails = { openDetails(item.id) }
+                        )
+                    }
                 }
             }
         } else {

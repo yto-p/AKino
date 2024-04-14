@@ -23,6 +23,8 @@ class MainViewModel: ViewModel() {
         MoviesPagingSource()
     }.flow
 
+    val isLoading = MutableStateFlow(false)
+
     val yearText = MutableStateFlow("")
     val countryText = MutableStateFlow("")
     val ageText = MutableStateFlow("")
@@ -64,7 +66,9 @@ class MainViewModel: ViewModel() {
             }
         viewModelScope.launch {
             try {
+                isLoading.value = true
                 val result = ApiClient.apiService.getMovieFilterList(1, 40, year, age, country)
+                isLoading.value = false
                 movieSearchList.value = result
             } catch (e: HttpException) {
                 e.printStackTrace()
