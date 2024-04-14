@@ -99,7 +99,7 @@ fun MainContent(
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(top = 32.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 6.dp)
     ) {
         val sheetState = rememberModalBottomSheetState()
         val scope = rememberCoroutineScope()
@@ -298,6 +298,7 @@ fun MainContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(18.dp))
+                        .padding(end = 10.dp)
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -326,7 +327,7 @@ fun MainContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 10.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_filter),
@@ -355,7 +356,7 @@ fun MainContent(
                 color = PrimaryColor,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 24.sp,
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = 10.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
             if (pagingData.itemCount != 0){
