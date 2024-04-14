@@ -116,8 +116,8 @@ fun MainContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 15.dp)
-                        .padding(bottom = 15.dp)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.filters),
