@@ -2,7 +2,7 @@ package com.mtuci.akino.main.data
 
 data class Movie(
     val id: Int,
-    val name: String,
+    val name: String?,
     val year: Int,
     val poster: Poster
 )

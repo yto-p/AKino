@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.mtuci.akino.R
 import com.mtuci.akino.main.data.Movie
 import com.mtuci.akino.ui.theme.BackgroundLightColor
 import com.mtuci.akino.ui.theme.PrimaryColor
@@ -62,7 +64,7 @@ fun MovieContent(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = movie.name.uppercase(),
+            text = movie.name?.uppercase() ?: stringResource(id = R.string.empty),
             color = PrimaryColor,
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,

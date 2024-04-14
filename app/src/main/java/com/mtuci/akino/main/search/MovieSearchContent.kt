@@ -74,7 +74,7 @@ fun MovieSearchContent(
                     .padding(top = 4.dp)
             ) {
                 Text(
-                    text = movieSearch.name.uppercase(),
+                    text = movieSearch.name?.uppercase() ?: stringResource(id = R.string.empty),
                     color = PrimaryColor,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
